@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NextDash</title>
+  <link href="https://cdn.jsdelivr.net/npm/chart.js" rel="preload" as="script">
+  <style>
+    :root {
+      --bg-color: rgba(15, 23, 42, 0.8);
+      --text-color: #ffffff;
+      --primary-color: #1e293b;
+      --secondary-color: rgba(255, 255, 255, 0.05);
+      --accent-color: #7dd3fc;
+      --card-bg: rgba(255, 255, 255, 0.1);
+      --glass-blur: blur(12px);
+    }
+
+    [data-theme="light"] {
+      --bg-color: #e2e8f0;
+      --text-color: #1e293b;
+      --primary-color: #f1f5f9;
+      --secondary-color: #ffffff;
+      --accent-color: #2563eb;
+      --card-bg: rgba(255, 255, 255, 0.7);
+      --glass-blur: blur(4px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-color);
+      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+      background-size: cover;
+      color: var(--text-color);
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      grid-template-rows: 60px 1fr;
+      grid-template-areas:
+        "sidebar header"
+        "sidebar main";
+      backdrop-filter: var(--glass-blur);
+    }
+
+    header {
+      grid-area: header;
+      background: linear-gradient(90deg, #1e3a8a, #1e40af);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+      backdrop-filter: var(--glass-blur);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo {
+      font-size: 1.7rem;
+      font-weight: 700;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .sidebar {
+      grid-area: sidebar;
+      background-color: rgba(30, 41, 59, 0.7);
+      padding: 1rem;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: var(--glass-blur);
+    }
+
+    .sidebar nav a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      margin: 1rem 0;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .sidebar nav a:hover {
+      color: var(--accent-color);
+    }
+
+    main {
+      grid-area: main;
+      padding: 2rem;
+      background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.05), transparent);
+      overflow-y: auto;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      padding: 1rem;
+      border-radius: 16px;
+      backdrop-filter: var(--glass-blur);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      margin-bottom: 2rem;
+      transition: transform 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .theme-toggle {
+      background: var(--accent-color);
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-left: 1rem;
+    }
+
+    .theme-select {
+      margin-left: 1rem;
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: none;
+    }
+
+    canvas {
+      width: 100% !important;
+      max-width: 600px;
+      margin: auto;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        grid-template-columns: 1fr;
+        grid-template-rows: 60px auto 1fr;
+        grid-template-areas:
+          "header"
+          "sidebar"
+          "main";
+      }
+
+      .sidebar {
+        flex-direction: row;
+        overflow-x: auto;
+      }
+
+      .sidebar nav a {
+        margin: 0 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div>
+      <h2>NextDash</h2>
+      <nav>
+        <a href="#">Dashboard</a>
+        <a href="#">Analytics</a>
+        <a href="#">3D Globe</a>
+        <a href="#">Settings</a>
+        <a href="#">Logout</a>
+      </nav>
+    </div>
+  </aside>
+
+  <header>
+    <div class="logo">🚀 NextDash - Space Command Center</div>
+    <div>
+      <select class="theme-select" onchange="setTheme(this.value)">
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+      </select>
+      <button class="theme-toggle" onclick="toggleTheme()">Toggle</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <h2>Welcome Aboard, Commander</h2>
+      <p>Monitor galaxy-wide data with 3D visualizations and real-time analytics.</p>
+    </div>
+    <div class="card">
+      <h3>Stellar Analytics</h3>
+      <canvas id="myChart"></canvas>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(125, 211, 252, 0.9)');
+    gradient.addColorStop(1, 'rgba(37, 117, 252, 0.2)');
+
+    const myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Neptune'],
+        datasets: [{
+          label: 'Cosmic Signals',
+          data: [20, 45, 28, 50, 33, 40],
+          backgroundColor: gradient,
+          borderRadius: 10,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: '#1e293b', titleColor: '#fff', bodyColor: '#fff' }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute("data-theme") || 'dark';
+      const newTheme = currentTheme === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", newTheme);
+    }
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+    }
+  </script>
+</body>
+
+</html>

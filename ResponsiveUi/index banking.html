@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Registration Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .form-container {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    /* Toast popup */
+    .toast {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      background-color: #d4edda;
+      color: #155724;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      font-weight: bold;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      z-index: 1000;
+      max-width: 300px;
+      flex-direction: column;
+    }
+
+    .toast.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .toast .icon {
+      font-size: 1.5rem;
+    }
+
+    .toast .user-details {
+      font-weight: normal;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Student Registration</h2>
+    <form id="registrationForm" novalidate>
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required />
+      </div>
+
+      <div class="form-group">
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" min="1" max="150" step="1" required />
+      </div>
+
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <span class="icon">✅</span>
+    <div>
+      <div id="toast-message">Student registration is complete!</div>
+      <div id="user-details" class="user-details"></div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('registrationForm');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+    const userDetails = document.getElementById('user-details');
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      if (!form.checkValidity()) {
+        showToast('❌ Please fill out all the required fields.', '', 'error');
+        return;
+      }
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const age = document.getElementById('age').value.trim();
+
+      const detailHTML = `👤 <strong>${name}</strong><br>📧 ${email}<br>🎂 Age: ${age}`;
+      showToast('✅ Student registration is complete!', detailHTML, 'success');
+
+      form.reset();
+    });
+
+    function showToast(message, details = '', type = 'success') {
+      toast.classList.add('show');
+
+      toastMessage.textContent = message;
+      userDetails.innerHTML = details;
+
+      // Set background color based on type
+      if (type === 'success') {
+        toast.style.backgroundColor = '#d4edda';
+        toast.style.color = '#155724';
+      } else {
+        toast.style.backgroundColor = '#f8d7da';
+        toast.style.color = '#721c24';
+      }
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
+    }
+  </script>
+
+</body>
+</html>
